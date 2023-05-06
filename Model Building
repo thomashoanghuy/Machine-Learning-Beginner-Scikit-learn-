@@ -1,0 +1,87 @@
+#A decision tree is a simple, yet powerful algorithm that creates a tree-like model of decisions and their possible consequences. 
+#The algorithm splits the data into smaller subsets based on the features that are most informative for predicting the outcome. Each decision is made based on the values of one feature, and the outcome is determined by the final leaf node of the tree
+#Example: "Does this house have more than 2 bedroom" . If yes, all the houses go 1 branch, if no , remaining house goes to another branch. 
+#Next 2 questions: 
+"Does this house landsize more than 1000 square meter?" for branch with Houses with 2 bedrooms or less. 
+"Does this house landsize more than 1500 square meters?" for branch with Houses with more than 2 bedrooms.
+#Further and further split the data into smaller and smaller subsets.
+
+#Let's build a simple Decision Tree
+
+# Split into validation and training data
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
+
+#Call the Decision Tree logics from Sckitlearn 
+melbourne_model = DecisionTreeRegressor(random_state=1)
+(we set random state = 1, so that our model has the same result each runs)
+
+#Fit Model
+melbourne_model.fit(train_X, train_y)
+
+#Make prediction on validation data
+prediction1 = melbourne_model.predict(val_X)
+print(prediction1)
+
+#Of course we can compare the prediction versus validation predictor y, using YOUR EYES. :)
+val_test = val_y.head(5)
+print(val_test)
+
+Compare the first 5 results from prediction1, and u can see whether the prediction is accurate. But your eyes are useless and incredibly manual for this task.
+
+To determine whether the quality of the model, we can look at whether the model is overfitting and underfitting
+
+Overfitting: When you segment dataset into too small leaf. Means 1 leaf contains only small number of houses.
+#If we insert a brandnew house, it can only fit into 1 single leaf (that satisfy all the split conditions), 
+Predicted price will may not be accurate, because it's made with only small number of data inside that 1 small leaf.
+
+Underfitting: is opposite with the above issue. Where the split is too shallow, one single leaf contains far too much data of houses
+#This leads to a problem where if you fit in a brand new house, it can easily fit into any of the big leaf and result in inaccurate prediction as well
+
+The ideal scenerio is to find out the Mean Absolute Error ( that sweet spot where we can reduce the lowest level of underfitting and overfitting)
+
+#Let's use another tool under SkLearn, that is mean_absolute_error(MAE)
+(see this article to understand the visualization of overfitting and underfitting on MAE versus the tree depth (height of the decision trees)
+https://www.kaggle.com/code/dansbecker/underfitting-and-overfitting
+
+#the lower MAE, the less effect of Overfitting and Underfitting. So we need to find the spot to get the lowest MAE for Validation and Training data.
+
+val_mae = mean_absolute_error(val_test ,prediction1)
+print("Mean Absolute Error")
+print(val_mae)
+
+Result = 623000.0
+
+#Now the above code is only calculating one MAE, which we cannot compare to any other models. 
+#That's why when we build ML model as beginner, it's best that we should write them as function-based coding
+
+def get_mae(max_leaf_nodes , train_x , val_x , train_y , val_y):
+    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=0)
+    model.fit(train_x , train_y)
+    prediction2 = model.predict(val_x)
+    mae = mean_absolute_error(val_y , prediction2)
+    return (mae)
+ 
+#now we can apply this function above to multiple numbers of nodes (splits)
+#remember that a leaf is a node without children.
+
+
+
+
+
+# Binary tree Theorem:
+# no. of internal node = i
+# number of nodes (both internal nodes and leaves) : n =2i + 1
+# (or vice versa : number of internal node = (n-1) / 2 )
+# number of leaves: l = (n+1)/ 2
+# vice versa: number of  nodes from leaves :  n = 2l -1 
+
+# hence relationship between internal nodes vs leaves 
+# 2i + 1 = 2l -1 => i = l -1 
+
+# maximum number of leaves = max-l = 2^(h-1) where h is the height of the trees
+
+
+for max_leaf_nodes in [5,50,500,5000]:
+    my_mae = get_mae(max_leaf_nodes , train_X , val_X , train_y, val_y)
+    print("For max leaf node: " , max_leaf_nodes , "MAE is " , my_mae )
+
