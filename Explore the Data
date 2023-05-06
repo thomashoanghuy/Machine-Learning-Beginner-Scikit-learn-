@@ -1,0 +1,53 @@
+#First download the data under this link https://www.kaggle.com/c/home-data-for-ml-course  and save in your local folder 
+# Define your file path and read your dataset by pandas
+
+import pandas as pd
+import numpy as np
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+
+melbourne_file_path = "C:/Users/user/Desktop/School/Data Projects/Melbourne Housing Snapshot/melb_data.csv"
+melbourne_data = pd.read_csv(melbourne_file_path)
+
+#EDA (Exploratory data analysis)
+
+table_summary = melbourne_data.describe()
+print(table_summary)
+
+#Average Landsize for Melbourne properties
+avg_lot_size = table_summary['Landsize']['mean']
+print("Average Landsize is " , avg_lot_size)
+
+newest_home_age = 2023 - table_summary['YearBuilt']['max']
+print("Newest Unit's age is " , newest_home_age)
+
+
+#Let's check if there is any missing data in our dataset.
+melbourne_data.isna().sum().sum()
+
+Result = 13256
+
+#There are missing data (na) in our dataset, so it's better if we just drop these NA data for now.
+melbourne_data = melbourne_data.dropna(axis= 0)
+
+# Select our target variable (the variable which we want to predict)
+# In this case, it is Price of the property
+
+y = melbourne_data.Price
+
+#Next let's see all the columns of these dataset that we are working with.
+melbourne_data.columns
+
+#Now I don't know much about housing prices, but to predict our target variable, we must select some columns from these columns.
+#Let's just select the obvious predictors that will definitely affect housing prices.
+
+melbourne_features = ['Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude']
+#we call all these predictors X
+X = melbourne_data[melbourne_features]
+
+#Great, now essentially machine learning model is mathematical functions that calculate y from x.
+#for example, Linear Regression, the easiest to understand, y = m * X + c (m being the gradient of the graph, c is the constant)
+
+
