@@ -1,0 +1,50 @@
+A decision tree is a simple, yet powerful algorithm that creates a tree-like model of decisions and their possible consequences. 
+The algorithm splits the data into smaller subsets based on the features that are most informative for predicting the outcome. 
+Each decision is made based on the values of one feature, and the outcome is determined by the final leaf node of the tree.
+
+
+Random Forest is an extension of decision trees that improves the accuracy and robustness of the algorithm by using an ensemble approach. 
+Random Forest creates multiple decision trees, each with a different subset of the training data and features. 
+During the prediction phase, the algorithm combines the predictions of all the decision trees to produce a final prediction. 
+By creating multiple trees, Random Forest reduces the risk of overfitting and increases the overall accuracy of the model
+
+
+# Basically, with Decision tree, there are so only so many height of 1 single tree can go, before it reaches the level of overfitting
+# Hence if we build multiple decision trees and combine their results, we can reduce the risks of overfitting.
+
+Let'S build Random Forest model with the above sets of data
+
+def get_mae(max_leaf_nodes , train_x , val_x , train_y , val_y):
+    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=0)
+    model.fit(train_x , train_y)
+    prediction2 = model.predict(val_x)
+    mae = mean_absolute_error(val_y , prediction2)
+    return (mae)
+
+def get_mae2(max_leaf_nodes , train_x , val_x , train_y , val_y):
+    forest_model = RandomForestRegressor(max_leaf_nodes=max_leaf_nodes , random_state=1)
+    forest_model.fit(train_x , train_y)
+    prediction3 = forest_model.predict(val_x)
+    mae = mean_absolute_error(val_y , prediction3)
+    return (mae)
+    
+leaf_nodes = [5,50,500,5000]
+list1 = []
+list2 = []
+for max_leaf_nodes in leaf_nodes:
+    decisiontree_mae = get_mae(max_leaf_nodes , train_X , val_X , train_y, val_y)
+    list1.append(decisiontree_mae)
+    randomforest_mae = get_mae2(max_leaf_nodes , train_X , val_X , train_y, val_y)
+    list2.append(randomforest_mae)
+    
+list3 = [list1 , list2]
+rows_name = ["Decision Trees" ," Random Forest"]
+comparison_table = pd.DataFrame(list3, columns = leaf_nodes , index =rows_name)
+print(comparison_table)
+
+#Based on MAE, the Random Forest has reduced MAE significantly compared to Decision Trees.
+#Even at 5000 nodes, Random Forest MAE is still decreasing, means the optimal MAE point for Random Forest model on this data is still further
+
+Remember that, the above models are only using FIVE predictors out multiple predictors in the original dataset. 
+Of course, the more predictors should, in theory, increase the accuracy of the models. But that is not always the case.
+We need to do more in the step EDA to explore the predictors and transform / eliminate predictors that are subjected other issues such as imbalance data, highly skewed , outliers etc...¶
